@@ -11,7 +11,7 @@ b. Clone the 'downloadSRA' repository to a folder within your scratch director
 
 Step 2 - create a file containing a list of accessions to download from the database. The file should contain 1 accession # per line, with no other information. Be sure to use LF line endings.
 
-ex.
+ex.  
 SRR5177530  
 SRR5177529  
 SRR5177528  
