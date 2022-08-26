@@ -18,6 +18,7 @@ SRR5177528
 SRR5177527  
 
 Step 3 - Use GetMetadataWith_ffq.sh to download accession metadata including ftp urls. This step should be run on the batch partition on the Sapelo2 cluster.   
+
 a.open the ffq script and replace the end of the line 18 accession="Path/To/Your/AccessionFile.txt" with the actual file path to your text file containing accession numbers.
 
 b. submit to the queue using: sbatch GetMetadataWith_ffq.sh
