@@ -2,7 +2,8 @@
 
 #check for required command line argument
 
-if [[ -z "$1" ]] then
+if [[ -z "$1" ]]
+then
 		echo "Include the path to your accession file in the command line call. eg. sh GetFastqFiles.sh Path/To/Your/AccessionFile.txt"
 		exit
 	else
