@@ -8,7 +8,7 @@ if [ -z "$1" ] then
 
 	else
 chmod 755 curlFastq.sh
-done
+fi
 
 
 #iterates through a directory of directories, each containing a metadata file produced by ffq --ftp. replace /scratch/zlewis/SRAtest/ with the path to your own directory.
