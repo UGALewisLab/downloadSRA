@@ -4,7 +4,11 @@
 
 if [[ -z "$1" ]]
 then
-		echo "Include the path to your accession file in the command line call. eg. sh GetFastqFiles.sh Path/To/Your/AccessionFile.txt"
+		echo "################
+		ERROR: You must include the path to your accession file in the command line call.
+		eg. sh GetFastqFiles.sh Path/To/Your/AccessionFile.txt
+		##################"
+
 		exit
 	else
 chmod 755 curlFastq.sh
