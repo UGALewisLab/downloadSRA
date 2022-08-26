@@ -27,8 +27,8 @@ mkdir ../FastqFiles
 while read -r line
 do
 #make a new directory for each accession
-  mkdir ../FastqFiles/${line}
+  mkdir ./FastqFiles/${line}
 #download metadata and store in a .JSON file
-  ffq -o ../FastqFiles/${line}/${line}.json --ftp "$line"
+  ffq -o ./FastqFiles/${line}/${line}.json --ftp "$line"
 
 done <"${accession}"
