@@ -4,7 +4,8 @@
 
 if [[ -z "$1" ]]
 then
-		echo "################
+		echo "
+		################
 		ERROR: You must include the path to your accession file in the command line call.
 		eg. sh GetFastqFiles.sh Path/To/Your/AccessionFile.txt
 		##################"
