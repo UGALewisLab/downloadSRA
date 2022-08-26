@@ -12,8 +12,8 @@
 
 cd $SLURM_SUBMIT_DIR
 
-##This script takes an input of SRR accession #s one per line. For each accessiob. Edit last line to include path to your list of accessions. 
-#Your accession file should include one accession per line with no other information. 
+##This script takes an input of SRR accession #s one per line. For each accessiob. Edit last line to include path to your list of accessions.
+#Your accession file should include one accession per line with no other information.
 
 accession="Path/To/Your/AccessionFile.txt"
 
@@ -24,13 +24,11 @@ mkdir ./FastqFiles
 
 #For each line of the accession file, make a directory and fetch fastq metadata using ffq
 
-while read -r line 
+while read -r line
 do
-#make a new directory for each accession 
+#make a new directory for each accession
   mkdir ./FastqFiles/${line}
 #download metadata and store in a .JSON file
   ffq -o ./FastqFiles/${line}/${line}.json --ftp "$line"
-  
-done <${accession}
- 
 
+done <"${accession}"
