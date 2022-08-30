@@ -13,8 +13,6 @@ then
 		"
 
 		exit
-	else
-chmod 755 curlFastq.sh
 fi
 
 
