@@ -10,8 +10,14 @@ grep -Eo '"url": "[^"]*"' ./${1}.json | grep -o '"[^"]*"$' | xargs -n 1 curl  -s
 res=$?
 if test "$res" != "0"; then
   echo "${1}, exit code ${res}: running grep/curl call again"
-
   grep -Eo '"url": "[^"]*"' ./${1}.json | grep -o '"[^"]*"$' | xargs -n 1 curl  -sS -C - -O
+
+  res=$?
+  if test "$res" != "0"; then
+    echo "${1}, exit code ${res}: running grep/curl call again"
+    grep -Eo '"url": "[^"]*"' ./${1}.json | grep -o '"[^"]*"$' | xargs -n 1 curl  -sS -C - -O
+  fi
+
 
 fi
 
