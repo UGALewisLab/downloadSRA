@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 
 accession="Path/To/Your/AccessionFile.txt"
 
-module load ffq/0.3.0-foss-2022a
+module load ffq/0.3.1-GCCcore-11.3.0
 
 #make a directory to store fastq metadata [.JSON] format and files.
 mkdir ../FastqFiles
