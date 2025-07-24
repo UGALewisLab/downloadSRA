@@ -1,58 +1,69 @@
 #!/bin/bash
 
-# Usage: ./download_fastqs.sh SRR8269810
+# Usage: sh curlFastq.sh accessions.txt
 
 set -euo pipefail
 
-ACCESSION="$1"
-JSON_FILE="../../${ACCESSION}.json"
-TARGET_DIR="../FastqFiles/${ACCESSION}"
-ERROR_LOG="download_errors.log"
+ACCESSION_FILE="$1"
+ERROR_LOG="../downloadSRA/errorLOG.txt"
+touch $ERROR_LOG
+NOHUP_LOG="../downloadSRA/nohupLOG.txt"
 
-mkdir -p "$TARGET_DIR"
-cd "$TARGET_DIR"
-
-# Check that the JSON file exists
-if [[ ! -f "${JSON_FILE}" ]]; then
-    echo "Error: JSON file ${JSON_FILE} not found."
+# Check that the input file exists
+if [[ ! -f "$ACCESSION_FILE" ]]; then
+    echo "❌ Error: input file $ACCESSION_FILE not found."
     exit 1
 fi
 
-# Clear previous error log
-> "$ERROR_LOG"
+while read -r ACCESSION; do
+  JSON_FILE="${ACCESSION}.json"
+  TARGET_DIR="../FastqFiles/${ACCESSION}"
+  ERROR_LOG="../downloadSRA/errorLOG.txt"
+ 
 
-# Loop through each file object in the JSON
-jq -c '.[]' "$JSON_FILE" | while read -r file_entry; do
-    url=$(echo "$file_entry" | jq -r '.url')
-    expected_md5=$(echo "$file_entry" | jq -r '.md5')
-    filename=$(basename "$url")
+  cd "$TARGET_DIR"
 
-    echo "📥 Downloading $filename..."
+  echo "🔍 Parsing $JSON_FILE..."
 
-    # Try downloading with 3 attempts
-    for attempt in {1..3}; do
-        curl --progress-bar -C - -O "$url" && break
-        echo "⚠️ Attempt $attempt failed for $filename"
-        sleep 2
-    done
 
-    if [[ ! -f "$filename" ]]; then
-        echo "❌ Failed to download $filename after 3 attempts" | tee -a "$ERROR_LOG"
-        continue
-    fi
+  # Extract each JSON object block (between { and }) and process it
+  awk '/{/{flag=1; obj=$0; next} /}/{obj=obj"\n"$0; flag=0; print obj; next} flag{obj=obj"\n"$0}' "$JSON_FILE" | while read -r block; do
+      url=$(echo "$block" | grep '"url":' | sed -E 's/.*"url": *"([^"]+)".*/\1/')
+      expected_md5=$(echo "$block" | grep '"md5":' | sed -E 's/.*"md5": *"([^"]+)".*/\1/')
 
-    # MD5 verification
-    echo "🔍 Verifying MD5 for $filename..."
-    actual_md5=$(md5sum "$filename" | awk '{print $1}')
+      if [[ -z "$url" || -z "$expected_md5" ]]; then
+          echo "⚠️ Skipping invalid entry in $JSON_FILE" | tee -a "$ERROR_LOG"
+          continue
+      fi
 
-    if [[ "$actual_md5" != "$expected_md5" ]]; then
-        echo "❌ MD5 mismatch for $filename: expected $expected_md5 but got $actual_md5" | tee -a "$ERROR_LOG"
-    else
-        echo "✅ MD5 verified for $filename"
-    fi
-done
+      filename=$(basename "$url")
+	  echo "📥 Downloading $filename..." | tee -a "$NOHUP_LOG"
+	  
+      for attempt in {1..3}; do
+          curl --progress-bar -C - -O "$url" && break
+          echo "⚠️ Attempt $attempt failed for $filename" | tee -a "$NOHUP_LOG"
+          sleep 2
+      done
 
-echo "✅ All downloads attempted for $ACCESSION"
-if [[ -s "$ERROR_LOG" ]]; then
-    echo "⚠️ Some errors were logged in $TARGET_DIR/$ERROR_LOG"
-fi
+      if [[ ! -f "$filename" ]]; then
+          echo "❌ Failed to download $filename after 3 attempts" | tee -a "$ERROR_LOG"
+          continue
+      fi
+
+      echo "🔍 Verifying MD5 for $filename..." | tee -a "$NOHUP_LOG"
+      actual_md5=$(md5sum "$filename" | awk '{print $1}')
+
+      if [[ "$actual_md5" != "$expected_md5" ]]; then
+          echo "❌ MD5 mismatch for $filename: expected $expected_md5 but got $actual_md5" | tee -a "$ERROR_LOG"
+      else
+          echo "✅ MD5 verified for $filename" | tee -a "$NOHUP_LOG"
+      fi
+  done
+
+  echo "✅ All downloads attempted for $ACCESSION" | tee -a "$NOHUP_LOG"
+  if [[ -s "$ERROR_LOG" ]]; then
+      echo "⚠️ Some errors were logged in $ERROR_LOG" | tee -a "$NOHUP_LOG"
+  fi
+
+  cd - > /dev/null
+done < "$ACCESSION_FILE"
