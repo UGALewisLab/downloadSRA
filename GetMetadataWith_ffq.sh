@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
-#SBATCH --time=144:00:00
+#SBATCH --time=1:00:00
 #SBATCH --output=./fetchfastq.%j.out
 #SBATCH --error=./fetchfastq.%j.err
 
@@ -15,7 +15,7 @@ cd $SLURM_SUBMIT_DIR
 ##This script takes an input of SRR accession #s one per line. For each accessiob. Edit last line to include path to your list of accessions.
 #Your accession file should include one accession per line with no other information.
 
-accession="Path/To/Your/AccessionFile.txt"
+accession="/scratch/zlewis/2024_HDA1_MS/Revision_GeneExpression/accessions.txt"
 
 module load ffq/0.3.1-GCCcore-11.3.0
 
